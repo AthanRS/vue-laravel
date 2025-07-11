@@ -4,7 +4,7 @@ import { storeToRefs } from "pinia";
 import { onMounted, reactive } from "vue";
 
 const {errors} = storeToRefs (useAuthStore());
-const { authenticate } = useAuthStore();
+const { loginAuth } = useAuthStore();
 
 const formData = reactive({
     email: "",
@@ -17,7 +17,7 @@ onMounted(()=>(errors.value={}));
 <template>
   <main>
     <h1 class="title">Login to your account</h1>
-    <form @submit.prevent="authenticate('login',formData);"
+    <form @submit.prevent="loginAuth('login',formData);"
      class="w-1/2 mx-auto space-y-6">
       <div>
         <input type="text" placeholder="Email" v-model="formData.email">

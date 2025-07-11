@@ -25,8 +25,8 @@ export const useAuthStore = defineStore("authStore",{
         },
 
 
-        //login or register user
-        async authenticate(apiRoute, formData) {
+        //login user
+        async loginAuth(apiRoute, formData) {
             const res = await fetch(`/api/${apiRoute}`, {
                 method: "post",
                 body: JSON.stringify(formData),
@@ -42,6 +42,29 @@ export const useAuthStore = defineStore("authStore",{
                 this.router.push({name: 'home'});
             }
             
+        },
+
+        //register user
+        async regAuth(apiRoute, formData) {
+            const res = await fetch(`/api/${apiRoute}`, {
+                method: "post",
+                body: JSON.stringify(formData),
+                headers: {
+                "Content-Type": "application/json",
+                },
+            });
+
+            const data = await res.json();
+
+            if (data.errors) {
+                this.errors = data.errors;
+                return false; 
+            } else {
+                this.errors = {};
+                this.user = null;
+                localStorage.removeItem("token");
+                return true; 
+            }
         },
 
         //logout user
@@ -62,6 +85,7 @@ export const useAuthStore = defineStore("authStore",{
                 localStorage.removeItem('token')
                 this.router.push({name:"home"});
             }
-        }
+        },
+
     },
 })

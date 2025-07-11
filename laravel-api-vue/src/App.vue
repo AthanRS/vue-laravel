@@ -16,7 +16,8 @@ const authStore = useAuthStore()
           <p class="text-sm text-slate-300">
             Welcome back {{ authStore.user.name }}
           </p>
-          <RouterLink :to="{ name: 'create'}" class="nav-link">New post</RouterLink>
+          <RouterLink :to="{ name: 'create'}" class="nav-link">New Post</RouterLink>
+          <RouterLink :to="{ name: 'user'}" class="nav-link">Users</RouterLink>
           <form @submit.prevent="authStore.logout">
             <button class="nav-link">Logout</button>
           </form>
