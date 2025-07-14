@@ -1,0 +1,66 @@
+# User Management App
+
+A full-stack **User Management System** built with:
+
+- ✅ Laravel (API Backend)
+- ✅ Vue 3 (Frontend)
+- ✅ Pinia (State Management)
+- ✅ TailwindCSS (Styling)
+- ✅ Laravel Sanctum (Authentication)
+
+---
+
+## Features
+
+- User authentication (login, register, logout)
+- JWT token storage & usage
+- Fully authenticated CRUD for users
+- Role-ready structure
+- Responsive UI using TailwindCSS
+- Form validation with Laravel + frontend display
+
+---
+
+## Tech Stack
+
+| Layer      | Technology         |
+|------------|--------------------|
+| Frontend   | Vue 3 + Vite       |
+| State      | Pinia              |
+| Styling    | Tailwind CSS       |
+| Backend    | Laravel 10         |
+| Auth       | Laravel Sanctum    |
+| API Comm   | Fetch API          |
+
+---
+
+## Setup Instructions
+
+### 1. Download the Repository
+
+https://github.com/AthanRS/vue-laravel
+
+2. Backend Setup (Laravel)
+cd backend     # or wherever your Laravel project is
+
+# Install dependencies
+composer install
+
+# Install Laravel Sanctum (if not done)
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+php artisan migrate
+
+Start the Laravel backend:
+php artisan serve
+
+3. Frontend Setup (Vue 3)
+cd frontend     # or wherever your Vue project is
+
+# Install dependencies
+npm install
+
+# Start the dev server
+npm run dev
+
+To check database:
+Install Virtual Studio Code and install SQLite3 Editor in the extension and open database.sqlite in backend
