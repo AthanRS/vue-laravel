@@ -7,6 +7,8 @@ import CreateView from '@/views/Posts/CreateView.vue'
 import UserView from '@/views/Posts/UserView.vue'
 import ShowView from '@/views/Posts/ShowView.vue'
 import UpdateView from '@/views/Posts/UpdateView.vue'
+import VerifyEmail from '@/views/Auth/VerifyEmailView.vue'
+import VerifySuccess from '@/views/Auth/VerifySuccess.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -51,6 +53,21 @@ const router = createRouter({
       component: UserView,
       meta: {auth:true},
     },
+
+    {
+      path: "/verify-email",
+      name: "verify-email",
+      component: VerifyEmail,
+      meta: { requiresAuth: true },
+    },
+
+{
+    path: "/verification-success",
+    name: "verification-success",
+    component: VerifySuccess,
+    meta: { requiresAuth: true, hideNav: true },
+  },
+
     
   ],
 })

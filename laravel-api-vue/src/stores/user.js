@@ -22,11 +22,8 @@ export const useUserStore = defineStore('user', {
     async deleteUser(id) {
       await fetch(`/api/users/${id}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
       });
-      this.users = this.users.filter(user => user.id !== id);
     },
 
 

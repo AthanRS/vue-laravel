@@ -1,91 +1,117 @@
 import { defineStore } from "pinia";
 
-export const useAuthStore = defineStore("authStore",{
-    state: () => {
-        return {
-            user: null,
-            errors:{},
-        };
-    },
+export const useAuthStore = defineStore("authStore", {
+    state: () => ({
+        user: null,
+        errors: {},
+    }),
 
     actions: {
-        //get authenticated user
+        // Get authenticated user
         async getUser() {
-            if (localStorage.getItem("token")){
-                const res = await fetch("/api/user",{
+            if (localStorage.getItem("token")) {
+                const res = await fetch("/api/user", {
                     headers: {
-                        authorization: `Bearer ${localStorage.getItem("token")}`,
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
                 });
-                const data = await res.json();
-                if (res.ok){
+
+                if (res.ok) {
+                    const data = await res.json();
                     this.user = data;
                 }
             }
         },
 
-
-        //login user
+        // Login user
         async loginAuth(apiRoute, formData) {
             const res = await fetch(`/api/${apiRoute}`, {
-                method: "post",
-                body: JSON.stringify(formData),
-            })
-
-            const data = await res.json();
-            if (data.errors){
-                this.errors = data.errors
-            } else{
-                this.errors = {}
-                localStorage.setItem('token',data.token)
-                this.user = data.user
-                this.router.push({name: 'home'});
-            }
-            
-        },
-
-        //register user
-        async regAuth(apiRoute, formData) {
-            const res = await fetch(`/api/${apiRoute}`, {
-                method: "post",
-                body: JSON.stringify(formData),
+                method: "POST",
                 headers: {
-                "Content-Type": "application/json",
+                    "Content-Type": "application/json",
                 },
+                body: JSON.stringify(formData),
             });
 
             const data = await res.json();
 
             if (data.errors) {
                 this.errors = data.errors;
-                return false; 
+            } else if (res.status === 403 && data.errors?.email?.[0]?.includes('not verified')) {
+                //  Block login if email not verified
+                this.errors = { email: ["Please verify your email before logging in."] };
+            } else {
+                this.errors = {};
+                localStorage.setItem("token", data.token);
+                this.user = data.user;
+                this.router.push({ name: "home" });
+            }
+        },
+
+        // Register user
+        async regAuth(apiRoute, formData) {
+            const res = await fetch(`/api/${apiRoute}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await res.json();
+
+            if (data.errors) {
+                this.errors = data.errors;
+                return false;
             } else {
                 this.errors = {};
                 this.user = null;
                 localStorage.removeItem("token");
-                return true; 
+                return true; // Show "check your email" modal
             }
         },
 
-        //logout user
-        async logout(){
-            const res = await fetch('api/logout',{
-                method: 'post',
+        // Logout user
+        async logout() {
+            const res = await fetch("/api/logout", {
+                method: "POST",
                 headers: {
-                    authorization: `Bearer ${localStorage.getItem("token")}`,
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
-            })
-
-            const data = await res.json()
-            console.log(data) 
+            });
 
             if (res.ok) {
-                this.user = null
-                this.errors = {}
-                localStorage.removeItem('token')
-                this.router.push({name:"home"});
+                this.user = null;
+                this.errors = {};
+                localStorage.removeItem("token");
+                this.router.push({ name: "login" });
             }
         },
 
+        // Check if email is verified
+        async checkEmailVerified() {
+            const res = await fetch("/api/user", {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+
+            if (!res.ok) return false;
+
+            const data = await res.json();
+            return data.email_verified_at !== null;
+        },
+
+        // Resend email verification
+        async resendVerificationEmail() {
+            const res = await fetch("/api/email/resend", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+
+            return res.ok;
+        },
     },
-})
+});

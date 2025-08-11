@@ -48,7 +48,7 @@ const deleteUser = async (id) => {
   <main class="p-4 sm:p-6">
     <h1 class="text-xl sm:text-2xl font-bold mb-4">User Management</h1>
 
-        <!-- TABLE for md and up -->
+    <!-- TABLE for md and up -->
     <div v-if="users.length > 0">
     <!-- Table layout for larger screens -->
     <div class="overflow-x-auto border rounded-lg hidden sm:block">

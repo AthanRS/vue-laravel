@@ -5,25 +5,31 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Auth\Events\Registered;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $fields=$request->validate([
+        $fields = $request->validate([
             'name' => 'required|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|confirmed'
         ]);
-        $user = User::create($fields);
 
-        $token = $user->createToken($request->name);
+        $user = User::create([
+            'name' => $fields['name'],
+            'email' => $fields['email'],
+            'password' => bcrypt($fields['password']),
+        ]);
 
-        return [
-            'user'=> $user,
-            'token' => $token->plainTextToken
-        ];
+        event(new Registered($user)); // <- This sends the email
+
+        return response()->json([
+            'message' => 'Registration successful. Please verify your email.'
+        ]);
     }
+
     public function login(Request $request)
     {
         $request->validate([
@@ -31,28 +37,38 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
-        $user = User::where('email',$request->email)->first();
+        $user = User::where('email', $request->email)->first();
 
-        if(!$user || !Hash::check($request->password, $user->password)){
-            return [
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
                 'errors' => [
                     'email' => ['The provided credentials are incorrect.']
                 ]
-            ];
+            ], 422);
+        }
+
+        // Check if email is verified
+        if (!$user->hasVerifiedEmail()) {
+            return response()->json([
+                'errors' => [
+                    'email' => ['You must verify your email address before logging in.']
+                ]
+            ], 403);
         }
 
         $token = $user->createToken($user->name);
 
-        return [
-            'user'=> $user,
+        return response()->json([
+            'user' => $user,
             'token' => $token->plainTextToken
-        ];
+        ]);
     }
+
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
         return [
             'message' => 'You are logged out.'
         ];
-    }        
+    }
 }
